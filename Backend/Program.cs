@@ -1,4 +1,16 @@
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+var connectionString =
+    builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException("Connection string"
+        + "'DefaultConnection' not found.");
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(connectionString));
+
+
 var app = builder.Build();
 
 var products = new List<Product>
@@ -32,7 +44,7 @@ app.Run();
 
 public class Product
 {
-    public int Id { get; }
+    public int Id { get; set;}
     public string Name { get; set; }
     public decimal Price { get; set; }
 
@@ -42,4 +54,13 @@ public class Product
         Name = name;
         Price = price;
     }
+}
+
+
+public class ApplicationDbContext : DbContext
+{
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options) { }
+
+    public DbSet<Product> Products { get; set; } = null!;
 }
