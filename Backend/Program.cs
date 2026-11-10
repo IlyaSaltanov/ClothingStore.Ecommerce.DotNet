@@ -1,4 +1,6 @@
+using ClothingStore.Api;
 using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,54 +15,43 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var app = builder.Build();
 
-var products = new List<Product>
-{
-    new(1, "Куртка «Север»", 12990m),
-    new(2, "Вейдерсы Pro", 8490m)
-};
+// var products = new List<Product>
+// {
+//     new(1, "Куртка «Север»", 12990m),
+//     new(2, "Вейдерсы Pro", 8490m)
+// };
 
-IReadOnlyList<Product> GetAllProducts()
+// IReadOnlyList<Product> GetAllProducts()
+// {
+//     return products;
+// }
+
+// IResult GetProductById(int id)
+// {
+//     foreach (Product product in products)
+//     {
+//         if (product.Id == id)
+//         {
+//             return Results.Ok(product);
+//         }
+//     }
+
+//     return Results.NotFound();
+// }
+
+IResult CreateProduct(CreateProductRequest request, ApplicationDbContext database)
 {
-    return products;
+    Product product = new Product(0, request.Name, request.Price);
+
+    database.Products.Add(product);
+    database.SaveChanges();
+
+    return Results.Created($"/api/products/{product.Id}", product);
 }
 
-IResult GetProductById(int id)
-{
-    foreach (Product product in products)
-    {
-        if (product.Id == id)
-        {
-            return Results.Ok(product);
-        }
-    }
+// app.MapGet("/api/products", GetAllProducts);
+// app.MapGet("/api/products/{id:int}", GetProductById);
 
-    return Results.NotFound();
-}
-
-app.MapGet("/api/products", GetAllProducts);
-app.MapGet("/api/products/{id:int}", GetProductById);
+app.MapPost("/api/products", CreateProduct);
 
 app.Run();
-
-public class Product
-{
-    public int Id { get; set;}
-    public string Name { get; set; }
-    public decimal Price { get; set; }
-
-    public Product(int id, string name, decimal price)
-    {
-        Id = id;
-        Name = name;
-        Price = price;
-    }
-}
-
-
-public class ApplicationDbContext : DbContext
-{
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-        : base(options) { }
-
-    public DbSet<Product> Products { get; set; } = null!;
-}
