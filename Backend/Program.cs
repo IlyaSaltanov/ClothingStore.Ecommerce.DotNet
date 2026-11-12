@@ -1,5 +1,7 @@
 using ClothingStore.Api;
 using Microsoft.EntityFrameworkCore;
+using ClothingStore.Api.Models;
+using ClothingStore.Api.Dots;
 
 
 var builder = WebApplication.CreateBuilder(args);
