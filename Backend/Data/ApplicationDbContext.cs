@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ClothingStore.Api.Models;
 
-namespace ClothingStore.Api;
+namespace ClothingStore.Api.Data;
 
 public class ApplicationDbContext : DbContext
 {
